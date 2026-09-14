@@ -1,0 +1,55 @@
+{
+  "name": "@edith/mcp-server",
+  "displayName": "EDITH MCP Server",
+  "description": "Model Context Protocol server that lets any MCP client (Claude Code, Codex, Cursor, OpenClaw) delegate browser tasks to a running EDITH extension — in the user's real, already-authenticated browser session.",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "edith-mcp": "dist/index.js"
+  },
+  "license": "MIT",
+  "homepage": "https://edith.one",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edith-one/edith.git",
+    "directory": "mcp-server"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "test": "npm run build && node --test test/bridge.test.mjs test/catalog.test.mjs test/config.test.mjs test/runs-request-timeout.test.mjs test/runs-timeout.test.mjs test/stdio-shutdown.test.mjs",
+    "clean": "rm -rf dist",
+    "prepack": "npm run build",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "edith",
+    "browser-agent",
+    "browser-automation",
+    "claude-code",
+    "codex",
+    "cursor"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "ws": "^8.18.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/ws": "^8.5.10",
+    "typescript": "^5.5.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

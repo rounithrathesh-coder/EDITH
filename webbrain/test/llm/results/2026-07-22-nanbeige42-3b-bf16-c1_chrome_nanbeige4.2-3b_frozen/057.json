@@ -1,0 +1,29 @@
+{
+  "id": "057",
+  "user": "download the readme",
+  "mode": "act",
+  "tab": {
+    "url": "https://github.com/esokullu/edith",
+    "title": "esokullu/edith — GitHub"
+  },
+  "latencyMs": 4939,
+  "error": null,
+  "firstToolCall": {
+    "name": "download_file",
+    "args": {
+      "url": "https://github.com/esokullu/edith/raw/main/README.md",
+      "filename": "edith-README.md"
+    }
+  },
+  "toolCallSource": "tool_calls",
+  "finishReason": "tool_calls",
+  "content": "I'll download the README from the esokullu/edith GitHub repository. Let me use the raw URL format.",
+  "usage": {
+    "prompt_tokens": 18584,
+    "total_tokens": 18995,
+    "completion_tokens": 411,
+    "prompt_tokens_details": null
+  },
+  "attempts": 1,
+  "retryErrors": []
+}
