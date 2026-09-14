@@ -776,6 +776,7 @@ export class ProviderManager {
         providerName: 'openrouter',
         baseUrl: 'https://openrouter.ai/api/v1',
         model: OPENROUTER_DEFAULT_MODEL,
+        supportsVision: true,
         supportsStreamUsageOptions: true,
         supportsAskStreaming: true,
         apiKey: '',

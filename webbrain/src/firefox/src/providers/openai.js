@@ -138,7 +138,10 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
     // checkpoint needed), so qwen3\.[5-9] catches those alongside the
     // older qwen*vl-suffixed lines.
     const m = (this.config.model || '').toLowerCase();
-    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3|deepseek-v4-flash-vision-exp/.test(m);
+    if (providerName === 'openrouter' && (m === 'openrouter/free' || m === 'openrouter/auto' || m === 'auto')) {
+      return true;
+    }
+    return /gpt-4o|gpt-4\.1|gpt-4-turbo|gpt-5|claude|gemini|grok|minimax-m3|kimi-k(?:-?3|2\.[5-9])|llava|qwen.*vl|qwen2.*vl|qwen3.*vl|qwen3\.[5-9]|qwen3p8-27b|pixtral|llama.*vision|gemma.*vision|gemma-?[34]|step-3|deepseek-v4-flash-vision-exp|vision|[-_.]vl\b|[-_.]vl[-_.]/.test(m);
   }
 
   get useCompactPrompt() {
