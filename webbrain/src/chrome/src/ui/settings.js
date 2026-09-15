@@ -443,8 +443,8 @@ if (globalThis.chrome?.storage?.onChanged) {
   });
 }
 
-const EDITH_SUBSCRIBE_URL = 'https://edith.one/subscribe';
-const EDITH_ACCOUNT_URL = 'https://api.edith.one/account';
+const EDITH_SUBSCRIBE_URL = 'https://webbrain.one/subscribe';
+const EDITH_ACCOUNT_URL = 'https://api.webbrain.one/account';
 
 const DEFAULT_COST_ALLOWANCE_USD = 10;
 const MAX_AGENT_STEPS_DEFAULT = 130;
@@ -3217,12 +3217,12 @@ function renderProviders() {
     let providerNote = '';
     if (id === 'edith_cloud') {
       const linkStyle = 'color:var(--accent,#4A90D9);text-decoration:none;';
-      const privacyLink = `<a href="https://edith.one/privacy" target="_blank" rel="noopener noreferrer"
+      const privacyLink = `<a href="https://webbrain.one/privacy" target="_blank" rel="noopener noreferrer"
               style="${linkStyle}">${escapeHtml(t('st.providers.edith_note.privacy_link'))}</a>`;
       const subscribeLink = `<a href="${escapeHtml(subscribeHref)}" target="_blank" rel="noopener noreferrer"
-              style="${linkStyle}">edith.one/subscribe</a>`;
+              style="${linkStyle}">webbrain.one/subscribe</a>`;
       const accountLink = `<a href="${escapeHtml(accountHref)}" target="_blank" rel="noopener noreferrer"
-              style="${linkStyle}">api.edith.one/account</a>`;
+              style="${linkStyle}">api.webbrain.one/account</a>`;
       providerNote = `<div style="margin-top:10px;padding:10px 12px;border-radius:6px;
                   background:rgba(74,144,217,0.08);border:1px solid rgba(74,144,217,0.22);
                   font-size:12px;color:var(--text2);line-height:1.5;">

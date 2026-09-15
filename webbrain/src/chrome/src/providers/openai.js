@@ -167,10 +167,10 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
         headers['Authorization'] = `Bearer ${this.config.apiKey}`;
       }
     }
-    if (providerName === 'edith-cloud') {
-      if (this.config.deviceGuid) headers['X-EDITH-Device-Id'] = this.config.deviceGuid;
-      headers['X-EDITH-Client'] = 'extension';
-      headers['X-EDITH-Help-Improve'] = this.config.helpImproveEDITH === false ? '0' : '1';
+    if (providerName === 'edith-cloud' || providerName === 'webbrain-cloud') {
+      if (this.config.deviceGuid) headers['X-WebBrain-Device-Id'] = this.config.deviceGuid;
+      headers['X-WebBrain-Client'] = 'extension';
+      headers['X-WebBrain-Help-Improve'] = this.config.helpImproveEDITH === false ? '0' : '1';
     }
     // OpenRouter-specific headers
     if (providerName === 'openrouter') {
@@ -187,7 +187,8 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
   }
 
   async sendRuntimeEvents(sessionId, events, { timeoutMs = 2500 } = {}) {
-    if (String(this.config.providerName || '').toLowerCase() !== 'edith-cloud') {
+    const providerName = String(this.config.providerName || '').toLowerCase();
+    if (providerName !== 'edith-cloud' && providerName !== 'webbrain-cloud') {
       return { ok: false, retryable: false, status: 0 };
     }
     const controller = typeof AbortController === 'function' ? new AbortController() : null;
@@ -251,7 +252,7 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
 
   _formatHttpError(status, body) {
     const providerName = (this.config.providerName || '').toLowerCase();
-    if (status === 402 && providerName === 'edith-cloud') {
+    if (status === 402 && (providerName === 'edith-cloud' || providerName === 'webbrain-cloud')) {
       let actionUrl = this._edithSubscribeUrl();
       let actionLabel = 'Subscribe for more usage';
       let message = 'Daily free EDITH Compass allowance used.';
@@ -263,9 +264,14 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
         } else if (parsed.subscribe_url) {
           actionUrl = parsed.subscribe_url;
         } else if (parsed.error?.code === 'edith_cloud_plus_tier_exceeded') {
-          actionUrl = '';
+          actionUrl = parsed.upgrade_url || this._edithSubscribeUrl();
+          actionLabel = 'Manage your plan';
+          message = 'Your daily EDITH Plus quota is exhausted.';
+        } else if (parsed.error?.code === 'edith_cloud_daily_limit_exceeded') {
+          actionUrl = parsed.upgrade_url || this._edithSubscribeUrl();
+          actionLabel = 'Upgrade to EDITH Plus';
+          message = 'Daily free EDITH Compass allowance used.';
         }
-        message = parsed.error?.message || message;
       } catch { /* keep fallback */ }
       return actionUrl ? `${message}\n${actionLabel}: ${actionUrl}` : message;
     }
@@ -326,7 +332,8 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
   }
 
   _addEDITHCloudContext(body, options) {
-    if (String(this.config.providerName || '').toLowerCase() !== 'edith-cloud') return;
+    const providerName = String(this.config.providerName || '').toLowerCase();
+    if (providerName !== 'edith-cloud' && providerName !== 'webbrain-cloud') return;
     const sessionId = String(options.edithSessionId || '').trim();
     if (sessionId) body.session_id = sessionId.slice(0, 200);
     const generationName = String(options.edithGenerationName || '').trim().toLowerCase();

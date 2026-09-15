@@ -5,7 +5,7 @@ export const PROFILE_SYNC_KEYS = {
   metadata: 'profileSyncMetadataV1', recovery: 'profileSyncRecoveryV1', everEnabled: 'profileSyncEverEnabled',
 };
 export const PROFILE_SYNC_DATA_KEYS = [USER_MEMORY_STORAGE_KEY, 'providers', 'activeProvider', 'visionModel', 'transcriptionModel', 'profileEnabled', 'profileText'];
-const API = 'https://api.edith.one/v1/sync';
+const API = 'https://api.webbrain.one/v1/sync';
 const ITERATIONS = 600000;
 const NON_PORTABLE_PROVIDER_ID = 'webgpu';
 const PORTABLE_ACTIVE_PROVIDER_KEY = 'profileSyncPortableActiveProvider';

@@ -10,18 +10,18 @@
   <script src="theme-bootstrap.js"></script>
   <style>
     :root {
-      --bg: #1a1a2e;
-      --bg2: #16213e;
-      --bg3: #1e2746;
-      --text: #e8e8e8;
-      --text2: #a0a0b8;
-      --accent: #6c63ff;
-      --accent2: #5a52d5;
+      --bg: #0a0d14;
+      --bg2: #111622;
+      --bg3: #182030;
+      --text: #f0f4f8;
+      --text2: #94a1b8;
+      --accent: #3568e5;
+      --accent2: #2557d6;
       --border: rgba(255,255,255,0.08);
-      --success: #4caf50;
-      --error: #f44336;
-      --warning: #ffc870;
-      --radius: 10px;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --radius: 12px;
       color-scheme: dark;
     }
     :root[data-theme="light"] {
@@ -40,8 +40,12 @@
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--bg);
+      background-image: radial-gradient(circle at 50% 0%, rgba(53, 104, 229, 0.08) 0%, transparent 60%);
+      background-attachment: fixed;
       color: var(--text);
       padding: 24px;
       max-width: 760px;

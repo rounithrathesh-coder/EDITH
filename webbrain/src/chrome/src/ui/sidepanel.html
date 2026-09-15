@@ -197,6 +197,10 @@
           hidden
         ><span aria-hidden="true">☢</span></button>
         <span id="status-dot" class="status-dot offline" data-i18n-title="sp.status.disconnected"></span>
+        <div id="privacy-shield-badge" class="privacy-shield-badge" title="Local Privacy Shield Active: On-device visual redaction & zero DOM leakage">
+          <span class="privacy-shield-icon">🛡️</span>
+          <span class="privacy-shield-text">Shield: Active</span>
+        </div>
       </div>
       <div class="header-right">
         <div id="language-picker" class="language-picker">
@@ -266,6 +270,24 @@
         <div id="messages"></div>
         <section id="chat-empty-state" class="chat-empty-state" aria-labelledby="chat-empty-state-heading">
           <h2 id="chat-empty-state-heading" class="chat-empty-state-heading" data-i18n="sp.help_message">How can I help with this page?</h2>
+          <div id="quick-action-chips" class="quick-action-chips">
+            <button type="button" class="quick-chip" data-prompt="Fill the form on this page with my details">
+              <span class="quick-chip-icon">📝</span>
+              <span class="quick-chip-label">Fill Form</span>
+            </button>
+            <button type="button" class="quick-chip" data-prompt="Summarize this page in 5 concise bullet points">
+              <span class="quick-chip-icon">📄</span>
+              <span class="quick-chip-label">Summarize</span>
+            </button>
+            <button type="button" class="quick-chip" data-prompt="Extract all structured data and tables from this page">
+              <span class="quick-chip-icon">📊</span>
+              <span class="quick-chip-label">Extract Data</span>
+            </button>
+            <button type="button" class="quick-chip" data-prompt="Find the best deals or pricing options on this page">
+              <span class="quick-chip-icon">🔍</span>
+              <span class="quick-chip-label">Find Deals</span>
+            </button>
+          </div>
           <div id="recommended-actions" class="recommended-actions hidden" aria-live="polite">
             <div class="recommended-actions-header">
               <div class="recommended-actions-title" data-i18n="sp.recommended.title">Suggested actions</div>

@@ -36,7 +36,7 @@ class BaseLLMProvider {
 
 | ID Fournisseur | Type | Catégorie | Modèle par défaut | Vision |
 |---|---|---|---|---|
-| `edith_cloud` | `openai` | cloud | `edith-cloud 1.0` | Oui |
+| `edith_cloud` | `openai` | cloud | `webbrain-cloud 1.0` | Oui |
 | `llamacpp` | `llamacpp` | local | (modèle chargé) | Métadonnées auto / surcharge |
 | `ollama` | `openai` | local | (modèle chargé) | Auto via `/api/show` / surcharge |
 | `lmstudio` | `openai` | local | (modèle chargé) | Métadonnées auto / surcharge |

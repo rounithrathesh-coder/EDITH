@@ -84,6 +84,53 @@ export const AGENT_TOOLS = [
   {
     type: 'function',
     function: {
+      name: 'click_coordinate',
+      description: 'Click on a visible element at visual coordinates (x, y) on the screen. Coordinates can be normalized (0-1000 or 0-1) or in viewport CSS pixels. Local agent snaps to nearest clickable target.',
+      parameters: {
+        type: 'object',
+        properties: {
+          x: { type: 'number', description: 'Horizontal coordinate (0-1000 or 0-1 or CSS px).' },
+          y: { type: 'number', description: 'Vertical coordinate (0-1000 or 0-1 or CSS px).' },
+        },
+        required: ['x', 'y'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'type_coordinate',
+      description: 'Focus and type text into a visual input field at visual coordinates (x, y).',
+      parameters: {
+        type: 'object',
+        properties: {
+          x: { type: 'number', description: 'Horizontal coordinate (0-1000 or 0-1 or CSS px).' },
+          y: { type: 'number', description: 'Vertical coordinate (0-1000 or 0-1 or CSS px).' },
+          text: { type: 'string', description: 'Text to type.' },
+          clear_first: { type: 'boolean', description: 'Clear existing text before typing (default: true).' },
+        },
+        required: ['x', 'y', 'text'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'scroll_page',
+      description: 'Scroll the active page viewport up or down.',
+      parameters: {
+        type: 'object',
+        properties: {
+          direction: { type: 'string', enum: ['up', 'down', 'top', 'bottom'], description: 'Scroll direction.' },
+          amount: { type: 'number', description: 'Scroll amount in pixels (default: 500).' },
+        },
+        required: ['direction'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'click_ax',
       description: 'Click an element by its ref_id from get_accessibility_tree. Scrolls into view, focuses, then clicks. ref_ids are stable across calls.',
       parameters: {
@@ -1146,10 +1193,11 @@ export const FULL_TOOL_NAMES = new Set(
  * schema size and the chance of picking a specialized tool with wrong params.
  */
 export const COMPACT_TOOL_NAMES = new Set([
-  'get_accessibility_tree', 'inspect_viewport', 'read_page', 'scroll',
+  'get_accessibility_tree', 'inspect_viewport', 'read_page', 'scroll', 'scroll_page',
   'get_window_info',
   'extract_data', 'get_selection', 'find_text',
   'click_ax', 'set_checked', 'type_ax', 'set_field',
+  'click_coordinate', 'type_coordinate',
   'click', 'type_text', 'press_keys',
   'navigate', 'carousel_navigate', 'wait_for_element',
   'fetch_url',
@@ -2019,6 +2067,7 @@ DEV MODE APPENDIX:
  */
 export const MID_TOOL_NAMES = new Set([
   'chat_observe', 'chat_send', 'get_accessibility_tree', 'inspect_viewport', 'click_ax', 'set_checked', 'type_ax', 'set_field',
+  'click_coordinate', 'type_coordinate', 'scroll_page',
   'list_webmcp_tools', 'execute_webmcp_tool',
   'read_page', 'read_pdf', 'get_window_info', 'get_interactive_elements',
   'click', 'type_text', 'press_keys', 'scroll', 'navigate', 'gmail_count_results', 'carousel_navigate', 'go_back', 'go_forward',

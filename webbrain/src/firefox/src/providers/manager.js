@@ -387,9 +387,9 @@ export class ProviderManager {
         type: 'openai',
         category: 'cloud',
         label: EDITH_CLOUD_PROVIDER_LABEL,
-        providerName: 'edith-cloud',
-        baseUrl: 'https://api.edith.one/v1',
-        model: 'edith-cloud 1.0',
+        providerName: 'webbrain-cloud',
+        baseUrl: 'https://api.webbrain.one/v1',
+        model: 'webbrain-cloud 1.0',
         contextWindow: EDITH_CLOUD_CONTEXT_WINDOW,
         inputCostPerMillionUsd: 0.20,
         outputCostPerMillionUsd: 1.15,
@@ -947,6 +947,34 @@ export class ProviderManager {
         ...migrated.edith_cloud,
         contextWindow: EDITH_CLOUD_CONTEXT_WINDOW,
       };
+    }
+    if (migrated.edith_cloud) {
+      const updates = {};
+      if (
+        !migrated.edith_cloud.baseUrl
+        || migrated.edith_cloud.baseUrl === 'https://api.edith.one/v1'
+        || migrated.edith_cloud.baseUrl === 'https://api.edith.one'
+      ) {
+        updates.baseUrl = 'https://api.webbrain.one/v1';
+      }
+      if (
+        !migrated.edith_cloud.providerName
+        || migrated.edith_cloud.providerName === 'edith-cloud'
+      ) {
+        updates.providerName = 'webbrain-cloud';
+      }
+      if (
+        !migrated.edith_cloud.model
+        || migrated.edith_cloud.model === 'edith-cloud 1.0'
+      ) {
+        updates.model = 'webbrain-cloud 1.0';
+      }
+      if (Object.keys(updates).length > 0) {
+        migrated.edith_cloud = {
+          ...migrated.edith_cloud,
+          ...updates,
+        };
+      }
     }
     for (const id of ROUTER_PROVIDER_IDS) {
       if (migrated[id] && migrated[id].category !== 'router') {

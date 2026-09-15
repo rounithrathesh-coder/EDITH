@@ -36,7 +36,7 @@ class BaseLLMProvider {
 
 | Provider ID | Type | Category | Default Model | Vision |
 |---|---|---|---|---|
-| `edith_cloud` | `openai` | cloud | `edith-cloud 1.0` | Yes |
+| `edith_cloud` | `openai` | cloud | `webbrain-cloud 1.0` | Yes |
 | `llamacpp` | `llamacpp` | local | (loaded model) | Auto metadata / override |
 | `ollama` | `openai` | local | (loaded model) | Auto via `/api/show` / override |
 | `lmstudio` | `openai` | local | (loaded model) | Auto metadata / override |

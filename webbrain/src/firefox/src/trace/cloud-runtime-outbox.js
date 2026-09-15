@@ -149,7 +149,8 @@ export async function enqueueCloudRuntimeEvent(sessionId, item) {
 }
 
 export async function flushCloudRuntimeOutbox(provider) {
-  if (String(provider?.config?.providerName || '').toLowerCase() !== 'edith-cloud') return 0;
+  const pName = String(provider?.config?.providerName || '').toLowerCase();
+  if (pName !== 'edith-cloud' && pName !== 'webbrain-cloud') return 0;
   if (typeof provider.sendRuntimeEvents !== 'function') return 0;
   await storageQueue.catch(() => {});
   let snapshot;

@@ -6157,7 +6157,8 @@ export class Agent extends LoopDetector {
   }
 
   _cloudGenerationOptions(provider, options = {}, { tabId = null, conversationId = null, generationName = 'main' } = {}) {
-    if (String(provider?.config?.providerName || '').toLowerCase() !== 'edith-cloud') return options;
+    const pName = String(provider?.config?.providerName || '').toLowerCase();
+    if (pName !== 'edith-cloud' && pName !== 'webbrain-cloud') return options;
     const effectiveConversationId = conversationId || (tabId != null ? this.conversationIds.get(tabId) : null);
     if (!effectiveConversationId) return options;
     return {
@@ -6299,7 +6300,7 @@ export class Agent extends LoopDetector {
     // EDITH Compass is billed and allowance-controlled by the managed
     // service, not by the user's per-provider API account. Its upstream token
     // cost must not consume the extension's user-configured spend allowance.
-    if (config.providerName === 'edith-cloud') return false;
+    if (config.providerName === 'edith-cloud' || config.providerName === 'webbrain-cloud') return false;
     if (this._isLocalBaseUrl(config.baseUrl)) return false;
     if (config.type === 'anthropic_oauth') return false;
     return config.category === 'cloud' || config.category === 'router';
@@ -7687,7 +7688,8 @@ export class Agent extends LoopDetector {
   }
 
   _isEDITHCloudProvider(provider) {
-    return String(provider?.config?.providerName || '').trim().toLowerCase() === 'edith-cloud';
+    const name = String(provider?.config?.providerName || '').trim().toLowerCase();
+    return name === 'edith-cloud' || name === 'webbrain-cloud';
   }
 
   _checkDeliveryObservationStreak(tabId, name, args = {}, result = null, options = {}) {
@@ -16510,7 +16512,8 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
    * Shared by the streaming and non-streaming message paths. (#9)
    */
   async _endTraceRun(tabId, runId, status, finalContent, { provider = null, messages = null, mode = '' } = {}) {
-    if (String(provider?.config?.providerName || '').toLowerCase() === 'edith-cloud') {
+    const pName = String(provider?.config?.providerName || '').toLowerCase();
+    if (pName === 'edith-cloud' || pName === 'webbrain-cloud') {
       try {
         const sessionId = this.conversationIds.get(tabId) || null;
         if (sessionId && provider?.config?.helpImproveEDITH !== false) {
@@ -29321,6 +29324,120 @@ Rules: no prose intro, no conclusion, no "this screenshot shows...", no layout d
         'coordinate-fallback',
         'bound-coordinate-target',
       );
+    }
+    if (name === 'click_coordinate') {
+      const rawX = Number(args?.x);
+      const rawY = Number(args?.y);
+      if (!Number.isFinite(rawX) || !Number.isFinite(rawY)) {
+        return { success: false, error: 'click_coordinate requires finite numeric x and y coordinates.' };
+      }
+      try {
+        const [execution] = await browser.tabs.executeScript(tabId, {
+          code: `(${((x, y) => {
+            const vw = window.innerWidth || 1280;
+            const vh = window.innerHeight || 800;
+            let cssX = x <= 1 && y <= 1 && x >= 0 && y >= 0 ? Math.round(x * vw) : (x <= 1000 && y <= 1000 ? Math.round((x / 1000) * vw) : Math.round(x));
+            let cssY = x <= 1 && y <= 1 && x >= 0 && y >= 0 ? Math.round(y * vh) : (x <= 1000 && y <= 1000 ? Math.round((y / 1000) * vh) : Math.round(y));
+            cssX = Math.max(0, Math.min(cssX, vw - 1));
+            cssY = Math.max(0, Math.min(cssY, vh - 1));
+            
+            const selectors = 'button, a[href], input, textarea, select, [role="button"], [role="link"], [tabindex]:not([tabindex="-1"]), [onclick], summary';
+            let el = document.elementFromPoint(cssX, cssY);
+            let snapped = false;
+            if (el && !el.closest(selectors)) {
+              for (const r of [5, 10, 15, 20, 25]) {
+                for (const deg of [0, 45, 90, 135, 180, 225, 270, 315]) {
+                  const rad = (deg * Math.PI) / 180;
+                  const cand = document.elementFromPoint(cssX + Math.round(Math.cos(rad) * r), cssY + Math.round(Math.sin(rad) * r));
+                  if (cand && cand.closest(selectors)) {
+                    el = cand.closest(selectors);
+                    snapped = true;
+                    break;
+                  }
+                }
+                if (snapped) break;
+              }
+            }
+            if (!el) return { success: false, error: 'No element found at coordinates.' };
+            if (typeof el.focus === 'function') el.focus();
+            if (typeof el.click === 'function') el.click();
+            return { success: true, targetTag: el.tagName.toLowerCase(), snapped, cssX, cssY };
+          }).toString()})(${rawX}, ${rawY})`,
+        });
+        return execution || { success: true, coordinates: { x: rawX, y: rawY } };
+      } catch (err) {
+        return { success: false, error: `click_coordinate failed: ${err.message}` };
+      }
+    }
+    if (name === 'type_coordinate') {
+      const rawX = Number(args?.x);
+      const rawY = Number(args?.y);
+      const textToType = typeof args?.text === 'string' ? args.text : '';
+      const clearFirst = args?.clear_first !== false;
+      if (!Number.isFinite(rawX) || !Number.isFinite(rawY)) {
+        return { success: false, error: 'type_coordinate requires finite numeric x and y coordinates.' };
+      }
+      try {
+        const [execution] = await browser.tabs.executeScript(tabId, {
+          code: `(${((x, y, text, clear) => {
+            const vw = window.innerWidth || 1280;
+            const vh = window.innerHeight || 800;
+            let cssX = x <= 1 && y <= 1 && x >= 0 && y >= 0 ? Math.round(x * vw) : (x <= 1000 && y <= 1000 ? Math.round((x / 1000) * vw) : Math.round(x));
+            let cssY = x <= 1 && y <= 1 && x >= 0 && y >= 0 ? Math.round(y * vh) : (x <= 1000 && y <= 1000 ? Math.round((y / 1000) * vh) : Math.round(y));
+            let el = document.elementFromPoint(cssX, cssY);
+            const inputSelector = 'input, textarea, [contenteditable="true"], [role="textbox"]';
+            if (el && !el.closest(inputSelector)) {
+              for (const r of [5, 10, 15, 20, 25]) {
+                for (const deg of [0, 45, 90, 135, 180, 225, 270, 315]) {
+                  const rad = (deg * Math.PI) / 180;
+                  const cand = document.elementFromPoint(cssX + Math.round(Math.cos(rad) * r), cssY + Math.round(Math.sin(rad) * r));
+                  if (cand && cand.closest(inputSelector)) {
+                    el = cand.closest(inputSelector);
+                    break;
+                  }
+                }
+                if (el && el.closest(inputSelector)) break;
+              }
+            }
+            if (!el) return { success: false, error: 'No input element found at coordinates.' };
+            if (typeof el.focus === 'function') el.focus();
+            if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+              if (clear) el.value = '';
+              el.value += text;
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              el.dispatchEvent(new Event('change', { bubbles: true }));
+              return { success: true, targetTag: el.tagName.toLowerCase(), value: el.value };
+            } else if (el.isContentEditable) {
+              if (clear) el.textContent = '';
+              el.textContent += text;
+              el.dispatchEvent(new Event('input', { bubbles: true }));
+              return { success: true, targetTag: el.tagName.toLowerCase() };
+            }
+            return { success: false, error: 'Element at coordinates is not an editable field.' };
+          }).toString()})(${rawX}, ${rawY}, ${JSON.stringify(textToType)}, ${clearFirst})`,
+        });
+        return execution || { success: true, typed: textToType };
+      } catch (err) {
+        return { success: false, error: `type_coordinate failed: ${err.message}` };
+      }
+    }
+    if (name === 'scroll_page') {
+      const direction = String(args?.direction || 'down').toLowerCase();
+      const amount = Number(args?.amount) || 500;
+      try {
+        const [execution] = await browser.tabs.executeScript(tabId, {
+          code: `(${((dir, amt) => {
+            if (dir === 'top') window.scrollTo({ top: 0, behavior: 'smooth' });
+            else if (dir === 'bottom') window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            else if (dir === 'up') window.scrollBy({ top: -amt, behavior: 'smooth' });
+            else window.scrollBy({ top: amt, behavior: 'smooth' });
+            return { success: true, scrolled: dir, scrollY: window.scrollY };
+          }).toString()})(${JSON.stringify(direction)}, ${amount})`,
+        });
+        return execution || { success: true, direction };
+      } catch (err) {
+        return { success: false, error: `scroll_page failed: ${err.message}` };
+      }
     }
     if (name === 'load_skill') {
       return this._loadSkillForRun(tabId, args || {});

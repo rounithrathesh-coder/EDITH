@@ -7,18 +7,18 @@
   <script src="theme-bootstrap.js"></script>
   <style>
     :root {
-      --bg: #1a1a2e;
-      --bg2: #16213e;
-      --bg3: #1e2746;
-      --bg4: #2a3558;
-      --text: #e8e8e8;
-      --text2: #a0a0b8;
-      --text3: #6d6d87;
-      --accent: #6c63ff;
-      --accent2: #5a52d5;
+      --bg: #0a0d14;
+      --bg2: #111622;
+      --bg3: #182030;
+      --bg4: #202a40;
+      --text: #f0f4f8;
+      --text2: #94a1b8;
+      --text3: #5e6b82;
+      --accent: #3568e5;
+      --accent2: #2557d6;
       --border: rgba(255,255,255,0.08);
-      --error: #f44336;
-      --radius: 10px;
+      --error: #ef4444;
+      --radius: 12px;
       color-scheme: dark;
     }
     :root[data-theme="light"] {
@@ -38,8 +38,12 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--bg);
+      background-image: radial-gradient(circle at 50% 0%, rgba(53, 104, 229, 0.08) 0%, transparent 60%);
+      background-attachment: fixed;
       color: var(--text);
       font-size: 13px;
       display: flex;

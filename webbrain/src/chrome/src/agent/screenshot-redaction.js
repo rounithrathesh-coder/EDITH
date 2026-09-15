@@ -38,12 +38,16 @@
 
 // Kinds of regions we redact. Kept as a frozen set so callers can decide
 // whether to redact each kind (e.g. only blur passwords, or also blur
-// detected emails/phones).
+// detected emails/phones, financial data, secret keys, faces).
 export const REGION_KIND = Object.freeze({
   PASSWORD: 'password',
   INPUT: 'input',
   EMAIL: 'email',
   PHONE: 'phone',
+  FINANCIAL: 'financial',
+  SECRET_KEY: 'secret_key',
+  ID_CARD: 'id_card',
+  FACE: 'face',
 });
 
 // Matches most address-like strings: local@domain.tld, possibly with
@@ -52,11 +56,17 @@ export const REGION_KIND = Object.freeze({
 const EMAIL_RE = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
 
 // Phone heuristic: 7–15 digits, optionally with an international prefix
-// (+, 00) and common separators (spaces, dashes, dots, parentheses). The
-// leading/trailing digit requirement plus the digit-count floor avoids
-// matching arbitrary short numbers. We also reject pure year-like 4-digit
-// runs (handled below in selectRedactionRegions).
+// (+, 00) and common separators (spaces, dashes, dots, parentheses).
 const PHONE_RE = /(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?){2,5}\d{2,4}/;
+
+// Financial: Credit cards, CVVs, IBAN-like patterns
+const CREDIT_CARD_RE = /\b(?:\d{4}[ -]?){3}\d{4}\b|\b\d{4}[ -]?\d{6}[ -]?\d{5}\b/;
+
+// Secret Keys / Tokens (API keys, JWT headers, private credentials)
+const SECRET_KEY_RE = /\b(?:sk-[a-zA-Z0-9-_]{20,}|ghp_[a-zA-Z0-9]{20,}|AIza[0-9A-Za-z-_]{35}|Bearer\s+[a-zA-Z0-9-_.]+)\b/;
+
+// Government IDs (SSN, Aadhaar 12-digit format, PAN)
+const GOV_ID_RE = /\b\d{3}-\d{2}-\d{4}\b|\b\d{4}\s\d{4}\s\d{4}\b|\b[A-Z]{5}[0-9]{4}[A-Z]{1}\b/;
 
 // Input element types whose *value* is sensitive and should always be
 // redacted when redaction is on.
@@ -128,25 +138,36 @@ export function selectRedactionRegions(elements, opts = {}) {
 
     if (redactDetectedPii && kind === 'text') {
       const text = el.text || '';
-      if (text.length > 200) continue; // long blobs are noise; skip
-      // Require a plausible single token (an address or a phone) rather than
-      // a sentence that merely contains one — blurring a whole paragraph for
-      // one embedded email is too aggressive.
+      if (text.length > 300) continue; // skip oversized text blobs
       const trimmed = text.trim();
-      const looksLikeEmail = EMAIL_RE.test(trimmed) && trimmed.split(/\s+/).length <= 3;
+      const looksLikeEmail = EMAIL_RE.test(trimmed);
       const digitCount = (trimmed.match(/\d/g) || []).length;
       const looksLikePhone = digitCount >= 7 && digitCount <= 15 && PHONE_RE.test(trimmed) &&
-        !/^\d{4}$/.test(trimmed) && trimmed.split(/\s+/).length <= 6;
-      if (looksLikeEmail) {
+        !/^\d{4}$/.test(trimmed);
+      const looksLikeCreditCard = CREDIT_CARD_RE.test(trimmed);
+      const looksLikeSecretKey = SECRET_KEY_RE.test(trimmed);
+      const looksLikeGovId = GOV_ID_RE.test(trimmed);
+
+      let detectedKind = null;
+      if (looksLikeEmail) detectedKind = REGION_KIND.EMAIL;
+      else if (looksLikeCreditCard) detectedKind = REGION_KIND.FINANCIAL;
+      else if (looksLikeSecretKey) detectedKind = REGION_KIND.SECRET_KEY;
+      else if (looksLikeGovId) detectedKind = REGION_KIND.ID_CARD;
+      else if (looksLikePhone) detectedKind = REGION_KIND.PHONE;
+
+      if (detectedKind) {
         if (!cull || rectIntersects(r, vx, vy, vw, vh)) {
-          out.push({ kind: REGION_KIND.EMAIL, rect: r });
+          out.push({ kind: detectedKind, rect: r });
           if (out.length >= maxRegions) return out;
         }
-      } else if (looksLikePhone) {
-        if (!cull || rectIntersects(r, vx, vy, vw, vh)) {
-          out.push({ kind: REGION_KIND.PHONE, rect: r });
-          if (out.length >= maxRegions) return out;
-        }
+        continue;
+      }
+    }
+
+    if (kind === 'face' || kind === 'avatar' || (kind === 'image' && el.isProfilePhoto)) {
+      if (!cull || rectIntersects(r, vx, vy, vw, vh)) {
+        out.push({ kind: REGION_KIND.FACE, rect: r });
+        if (out.length >= maxRegions) return out;
       }
     }
   }

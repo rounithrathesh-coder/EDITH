@@ -728,6 +728,19 @@ const storeReviewEl = document.getElementById('store-review-prompt');
 const storeReviewFeedbackEl = document.getElementById('store-review-feedback');
 const scheduledJobsEl = document.getElementById('scheduled-jobs');
 const stopBtn = document.getElementById('btn-stop');
+const quickActionChipsEl = document.getElementById('quick-action-chips');
+if (quickActionChipsEl) {
+  quickActionChipsEl.addEventListener('click', (e) => {
+    const chip = e.target.closest('.quick-chip');
+    if (!chip) return;
+    const prompt = chip.getAttribute('data-prompt');
+    if (prompt && inputEl) {
+      inputEl.value = prompt;
+      autoResizeInput();
+      inputEl.focus();
+    }
+  });
+}
 const RECOMMENDED_ACTIONS_COLLAPSED_KEY = 'recommendedActionsCollapsed';
 const EDITH_PROMOTION_ACTION_IDS = new Set(['tweet-edith', 'post-edith-linkedin']);
 const PLACEHOLDER_ROTATION_INTERVAL_MS = 10_000;

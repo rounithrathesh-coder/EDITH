@@ -36,7 +36,7 @@ class BaseLLMProvider {
 
 | 提供商 ID | 类型 | 类别 | 默认模型 | 视觉能力 |
 |---|---|---|---|---|
-| `edith_cloud` | `openai` | 云端 | `edith-cloud 1.0` | 是 |
+| `edith_cloud` | `openai` | 云端 | `webbrain-cloud 1.0` | 是 |
 | `llamacpp` | `llamacpp` | 本地 | （已加载模型） | 自动元数据 / 覆盖 |
 | `ollama` | `openai` | 本地 | （已加载模型） | 通过 `/api/show` 自动检测 / 覆盖 |
 | `lmstudio` | `openai` | 本地 | （已加载模型） | 自动元数据 / 覆盖 |
