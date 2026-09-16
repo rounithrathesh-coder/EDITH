@@ -173,7 +173,7 @@ export function sniffProviderIdFromBaseUrl(baseUrl) {
   if (hostMatchesDomain(host, 'aliyuncs.com')) return 'alibaba';
   if (hostMatchesDomain(host, 'minimax.chat') || hostMatchesDomain(host, 'minimax.io')
       || hostMatchesDomain(host, 'minimaxi.com')) return 'minimax';
-  if (hostMatchesDomain(host, 'edith.one')) return 'edith_cloud';
+  if (hostMatchesDomain(host, 'edith.one') || hostMatchesDomain(host, 'webbrain.one')) return 'edith_cloud';
   if (hostMatchesDomain(host, 'z.ai') || hostMatchesDomain(host, 'chatglm.cn')) return 'z_ai';
   return '';
 }

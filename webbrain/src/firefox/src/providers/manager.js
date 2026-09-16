@@ -352,6 +352,33 @@ export class ProviderManager {
     if (configs[EDITH_CLOUD_PROVIDER_ID]) {
       configs[EDITH_CLOUD_PROVIDER_ID].deviceGuid = await this._getDeviceGuid(data[EDITH_DEVICE_GUID_KEY]);
       configs[EDITH_CLOUD_PROVIDER_ID].helpImproveEDITH = data[HELP_IMPROVE_EDITH_KEY] !== false;
+      const currentBaseUrl = String(configs[EDITH_CLOUD_PROVIDER_ID].baseUrl || '').trim().replace(/\/+$/, '');
+      if (
+        !currentBaseUrl
+        || currentBaseUrl.includes('edith.one')
+        || !currentBaseUrl.includes('webbrain.one')
+      ) {
+        configs[EDITH_CLOUD_PROVIDER_ID].baseUrl = 'https://api.webbrain.one/v1';
+        providerStateMigrated = true;
+      }
+      const currentProviderName = String(configs[EDITH_CLOUD_PROVIDER_ID].providerName || '').trim().toLowerCase();
+      if (
+        !currentProviderName
+        || currentProviderName === 'edith-cloud'
+        || currentProviderName.includes('edith')
+      ) {
+        configs[EDITH_CLOUD_PROVIDER_ID].providerName = 'webbrain-cloud';
+        providerStateMigrated = true;
+      }
+      const currentModel = String(configs[EDITH_CLOUD_PROVIDER_ID].model || '').trim().toLowerCase();
+      if (
+        !currentModel
+        || currentModel === 'edith-cloud 1.0'
+        || currentModel.includes('edith')
+      ) {
+        configs[EDITH_CLOUD_PROVIDER_ID].model = 'webbrain-cloud 1.0';
+        providerStateMigrated = true;
+      }
     }
     this.activeProviderId = legacyActiveProviderId || EDITH_CLOUD_PROVIDER_ID;
     if (!configs[this.activeProviderId]) this.activeProviderId = EDITH_CLOUD_PROVIDER_ID;
@@ -950,22 +977,27 @@ export class ProviderManager {
     }
     if (migrated.edith_cloud) {
       const updates = {};
+      const currentBaseUrl = String(migrated.edith_cloud.baseUrl || '').trim().replace(/\/+$/, '');
       if (
-        !migrated.edith_cloud.baseUrl
-        || migrated.edith_cloud.baseUrl === 'https://api.edith.one/v1'
-        || migrated.edith_cloud.baseUrl === 'https://api.edith.one'
+        !currentBaseUrl
+        || currentBaseUrl.includes('edith.one')
+        || !currentBaseUrl.includes('webbrain.one')
       ) {
         updates.baseUrl = 'https://api.webbrain.one/v1';
       }
+      const currentProviderName = String(migrated.edith_cloud.providerName || '').trim().toLowerCase();
       if (
-        !migrated.edith_cloud.providerName
-        || migrated.edith_cloud.providerName === 'edith-cloud'
+        !currentProviderName
+        || currentProviderName === 'edith-cloud'
+        || currentProviderName.includes('edith')
       ) {
         updates.providerName = 'webbrain-cloud';
       }
+      const currentModel = String(migrated.edith_cloud.model || '').trim().toLowerCase();
       if (
-        !migrated.edith_cloud.model
-        || migrated.edith_cloud.model === 'edith-cloud 1.0'
+        !currentModel
+        || currentModel === 'edith-cloud 1.0'
+        || currentModel.includes('edith')
       ) {
         updates.model = 'webbrain-cloud 1.0';
       }

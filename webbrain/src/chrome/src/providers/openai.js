@@ -50,6 +50,9 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
 
   get baseUrl() {
     let baseUrl = String(this.config.baseUrl || 'https://api.openai.com/v1').trim();
+    if (baseUrl.includes('api.edith.one') || baseUrl.includes('edith.one')) {
+      baseUrl = baseUrl.replace(/https?:\/\/(?:api\.)?edith\.one/i, 'https://api.webbrain.one');
+    }
     const vertexLocation = String(this.config.location || '').trim();
     const replacements = {
       account_id: {
@@ -168,9 +171,16 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
       }
     }
     if (providerName === 'edith-cloud' || providerName === 'webbrain-cloud') {
-      if (this.config.deviceGuid) headers['X-WebBrain-Device-Id'] = this.config.deviceGuid;
-      headers['X-WebBrain-Client'] = 'extension';
-      headers['X-WebBrain-Help-Improve'] = this.config.helpImproveEDITH === false ? '0' : '1';
+      const isWebBrain = this.baseUrl.includes('webbrain.one') || String(this.config.baseUrl || '').includes('webbrain.one');
+      if (isWebBrain) {
+        if (this.config.deviceGuid) headers['X-WebBrain-Device-Id'] = this.config.deviceGuid;
+        headers['X-WebBrain-Client'] = 'extension';
+        headers['X-WebBrain-Help-Improve'] = this.config.helpImproveEDITH === false ? '0' : '1';
+      } else {
+        if (this.config.deviceGuid) headers['X-EDITH-Device-Id'] = this.config.deviceGuid;
+        headers['X-EDITH-Client'] = 'extension';
+        headers['X-EDITH-Help-Improve'] = this.config.helpImproveEDITH === false ? '0' : '1';
+      }
     }
     // OpenRouter-specific headers
     if (providerName === 'openrouter') {
@@ -243,7 +253,7 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
   }
 
   _edithSubscribeUrl() {
-    const url = new URL('https://edith.one/subscribe');
+    const url = new URL('https://webbrain.one/subscribe');
     if (this.config.deviceGuid) {
       url.searchParams.set('client_reference_id', this.config.deviceGuid);
     }
@@ -264,14 +274,12 @@ export class OpenAICompatibleProvider extends BaseLLMProvider {
         } else if (parsed.subscribe_url) {
           actionUrl = parsed.subscribe_url;
         } else if (parsed.error?.code === 'edith_cloud_plus_tier_exceeded') {
-          actionUrl = parsed.upgrade_url || this._edithSubscribeUrl();
-          actionLabel = 'Manage your plan';
-          message = 'Your daily EDITH Plus quota is exhausted.';
+          actionUrl = '';
         } else if (parsed.error?.code === 'edith_cloud_daily_limit_exceeded') {
           actionUrl = parsed.upgrade_url || this._edithSubscribeUrl();
           actionLabel = 'Upgrade to EDITH Plus';
-          message = 'Daily free EDITH Compass allowance used.';
         }
+        message = parsed.error?.message || message;
       } catch { /* keep fallback */ }
       return actionUrl ? `${message}\n${actionLabel}: ${actionUrl}` : message;
     }
