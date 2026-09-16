@@ -261,11 +261,15 @@ export class BaseLLMProvider {
    */
   async testConnection() {
     try {
-      // Responses reasoning models (e.g. muse-spark) count reasoning + output
-      // against max_output_tokens; 5 → 16 is too low and always returns
-      // `incomplete (max_output_tokens)`. Use a real budget for the health
-      // check when the provider routes to /responses.
-      const maxTokens = typeof this._usesResponsesApi === 'function' && this._usesResponsesApi() ? 512 : 5;
+      // Reasoning models (e.g. muse-spark, webbrain-cloud) count reasoning + output
+      // against max completion tokens; 5 tokens is too small and causes upstream errors.
+      // Use a real budget for reasoning models and cloud providers.
+      const pName = String(this.config?.providerName || this.name || '').toLowerCase();
+      const isReasoningOrCloud = (typeof this._usesResponsesApi === 'function' && this._usesResponsesApi())
+        || pName === 'edith-cloud'
+        || pName === 'webbrain-cloud'
+        || this.config?.category === 'cloud';
+      const maxTokens = isReasoningOrCloud ? 512 : 5;
       const res = await this.chat([{ role: 'user', content: 'Hi' }], { maxTokens });
       return { ok: true, model: this.config.model };
     } catch (e) {
