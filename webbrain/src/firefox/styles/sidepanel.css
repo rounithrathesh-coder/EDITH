@@ -2518,6 +2518,45 @@ html[data-ui-scale-ready="false"] body { visibility: hidden; }
 
 
 
+/* Privacy Shield Status Badge in Header */
+.privacy-shield-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 9px;
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: #34d399;
+  cursor: default;
+  user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.privacy-shield-badge:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+}
+
+.privacy-shield-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  color: #10b981;
+}
+
+.privacy-shield-text {
+  letter-spacing: 0.01em;
+}
+
 /* First-turn empty state — optically centered a little above the mathematical
    midpoint so the composer still feels connected to the invitation. */
 .chat-empty-state {
